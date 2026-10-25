@@ -1,0 +1,254 @@
+/**
+ * C++ Abstract Syntax Tree definitions tailored for DP Visualizer
+ */
+
+export type ASTNodeType =
+  | 'Program'
+  | 'FunctionDeclaration'
+  | 'StructDeclaration'
+  | 'VariableDeclaration'
+  | 'AssignmentStatement'
+  | 'CompoundAssignmentStatement'
+  | 'IndexAssignmentStatement'
+  | 'MemberAssignmentStatement'
+  | 'TieAssignmentStatement'
+  | 'IfStatement'
+  | 'WhileStatement'
+  | 'ForStatement'
+  | 'RangeForStatement'
+  | 'BreakStatement'
+  | 'ContinueStatement'
+  | 'ReturnStatement'
+  | 'ExpressionStatement'
+  | 'BlockStatement'
+  | 'EmptyStatement'
+  | 'BinaryExpression'
+  | 'UnaryExpression'
+  | 'UpdateExpression'
+  | 'CallExpression'
+  | 'MemberCallExpression'
+  | 'MemberAccessExpression'
+  | 'IndexAccessExpression'
+  | 'ConditionalExpression'
+  | 'TypeCastExpression'
+  | 'SequenceExpression'
+  | 'Identifier'
+  | 'Literal'
+  | 'ArrayLiteral';
+
+export interface BaseASTNode {
+  type: ASTNodeType;
+  line: number;
+}
+
+export interface ProgramNode extends BaseASTNode {
+  type: 'Program';
+  body: BaseASTNode[];
+}
+
+export interface FunctionDeclNode extends BaseASTNode {
+  type: 'FunctionDeclaration';
+  returnType: string;
+  name: string;
+  params: { type: string; name: string }[];
+  body: BlockStatementNode;
+}
+
+export interface StructDeclNode extends BaseASTNode {
+  type: 'StructDeclaration';
+  name: string;
+  members: { type: string; name: string }[];
+}
+
+export interface VariableDeclarator {
+  name: string;
+  isArray?: boolean;
+  arraySize?: BaseASTNode;
+  dimSizes?: BaseASTNode[];
+  initializer?: BaseASTNode;
+  constructorArgs?: BaseASTNode[];
+}
+
+export interface VariableDeclNode extends BaseASTNode {
+  type: 'VariableDeclaration';
+  varType: string;
+  name: string;
+  initializer?: BaseASTNode;
+  isArray?: boolean;
+  arraySize?: BaseASTNode;
+  dimSizes?: BaseASTNode[];
+  constructorArgs?: BaseASTNode[];
+  declarations?: VariableDeclarator[];
+  bindings?: string[];
+}
+
+export interface BlockStatementNode extends BaseASTNode {
+  type: 'BlockStatement';
+  body: BaseASTNode[];
+}
+
+export interface ExpressionStatementNode extends BaseASTNode {
+  type: 'ExpressionStatement';
+  expression: BaseASTNode;
+}
+
+export interface AssignmentStatementNode extends BaseASTNode {
+  type: 'AssignmentStatement';
+  target: string;
+  value: BaseASTNode;
+}
+
+export interface CompoundAssignmentStatementNode extends BaseASTNode {
+  type: 'CompoundAssignmentStatement';
+  target: BaseASTNode;
+  operator: string;
+  value: BaseASTNode;
+}
+
+export interface IndexAssignmentStatementNode extends BaseASTNode {
+  type: 'IndexAssignmentStatement';
+  array: BaseASTNode;
+  indices: BaseASTNode[];
+  value: BaseASTNode;
+  operator?: string;
+}
+
+export interface MemberAssignmentStatementNode extends BaseASTNode {
+  type: 'MemberAssignmentStatement';
+  object: BaseASTNode;
+  property: string;
+  value: BaseASTNode;
+}
+
+export interface TieAssignmentStatementNode extends BaseASTNode {
+  type: 'TieAssignmentStatement';
+  variables: string[];
+  value: BaseASTNode;
+}
+
+export interface IfStatementNode extends BaseASTNode {
+  type: 'IfStatement';
+  condition: BaseASTNode;
+  consequent: BaseASTNode;
+  alternate?: BaseASTNode;
+}
+
+export interface WhileStatementNode extends BaseASTNode {
+  type: 'WhileStatement';
+  condition: BaseASTNode;
+  body: BaseASTNode;
+}
+
+export interface ForStatementNode extends BaseASTNode {
+  type: 'ForStatement';
+  init?: BaseASTNode;
+  condition?: BaseASTNode;
+  update?: BaseASTNode;
+  body: BaseASTNode;
+}
+
+export interface RangeForStatementNode extends BaseASTNode {
+  type: 'RangeForStatement';
+  varType: string;
+  varName?: string;
+  bindings?: string[];
+  iterable: BaseASTNode;
+  body: BaseASTNode;
+}
+
+export interface BreakStatementNode extends BaseASTNode {
+  type: 'BreakStatement';
+}
+
+export interface ContinueStatementNode extends BaseASTNode {
+  type: 'ContinueStatement';
+}
+
+export interface ReturnStatementNode extends BaseASTNode {
+  type: 'ReturnStatement';
+  argument?: BaseASTNode;
+}
+
+export interface EmptyStatementNode extends BaseASTNode {
+  type: 'EmptyStatement';
+}
+
+export interface BinaryExpressionNode extends BaseASTNode {
+  type: 'BinaryExpression';
+  operator: string;
+  left: BaseASTNode;
+  right: BaseASTNode;
+}
+
+export interface UnaryExpressionNode extends BaseASTNode {
+  type: 'UnaryExpression';
+  operator: string;
+  argument: BaseASTNode;
+  prefix: boolean;
+}
+
+export interface UpdateExpressionNode extends BaseASTNode {
+  type: 'UpdateExpression';
+  operator: '++' | '--';
+  argument: BaseASTNode;
+  prefix: boolean;
+}
+
+export interface CallExpressionNode extends BaseASTNode {
+  type: 'CallExpression';
+  callee: string;
+  args: BaseASTNode[];
+}
+
+export interface MemberCallExpressionNode extends BaseASTNode {
+  type: 'MemberCallExpression';
+  object: BaseASTNode;
+  method: string;
+  args: BaseASTNode[];
+}
+
+export interface MemberAccessExpressionNode extends BaseASTNode {
+  type: 'MemberAccessExpression';
+  object: BaseASTNode;
+  property: string;
+}
+
+export interface IndexAccessExpressionNode extends BaseASTNode {
+  type: 'IndexAccessExpression';
+  array: BaseASTNode;
+  index: BaseASTNode;
+}
+
+export interface ConditionalExpressionNode extends BaseASTNode {
+  type: 'ConditionalExpression';
+  condition: BaseASTNode;
+  consequent: BaseASTNode;
+  alternate: BaseASTNode;
+}
+
+export interface IdentifierNode extends BaseASTNode {
+  type: 'Identifier';
+  name: string;
+}
+
+export interface LiteralNode extends BaseASTNode {
+  type: 'Literal';
+  value: any;
+  raw: string;
+}
+
+export interface ArrayLiteralNode extends BaseASTNode {
+  type: 'ArrayLiteral';
+  elements: BaseASTNode[];
+}
+
+export interface TypeCastExpressionNode extends BaseASTNode {
+  type: 'TypeCastExpression';
+  targetType: string;
+  argument: BaseASTNode;
+}
+
+export interface SequenceExpressionNode extends BaseASTNode {
+  type: 'SequenceExpression';
+  expressions: BaseASTNode[];
+}
