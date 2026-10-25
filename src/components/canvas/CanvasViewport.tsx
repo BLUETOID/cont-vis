@@ -77,7 +77,7 @@ export const CanvasViewport: React.FC<CanvasViewportProps> = ({
         flex: 1,
         position: 'relative',
         overflow: 'hidden',
-        background: '#0a0f1d',
+        background: 'var(--bg-primary)',
         cursor: isDragging ? 'grabbing' : 'grab',
         userSelect: 'none',
       }}
@@ -90,12 +90,12 @@ export const CanvasViewport: React.FC<CanvasViewportProps> = ({
           width: '100%',
           height: '100%',
           pointerEvents: 'none',
-          opacity: 0.12,
+          opacity: 0.25,
         }}
       >
         <defs>
           <pattern id="grid-pattern" width="32" height="32" patternUnits="userSpaceOnUse">
-            <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#475569" strokeWidth="0.6" />
+            <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#27272a" strokeWidth="0.8" />
           </pattern>
         </defs>
         <rect width="100%" height="100%" fill="url(#grid-pattern)" />
@@ -110,10 +110,10 @@ export const CanvasViewport: React.FC<CanvasViewportProps> = ({
             left: '12px',
             zIndex: 20,
             display: 'flex',
-            background: '#111827',
+            background: 'var(--bg-card)',
             padding: '3px',
             borderRadius: '6px',
-            border: '1px solid #374151',
+            border: '1px solid var(--border-subtle)',
           }}
         >
           <button
@@ -126,9 +126,9 @@ export const CanvasViewport: React.FC<CanvasViewportProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              background: viewMode === 'table' ? '#2563eb' : 'transparent',
-              color: viewMode === 'table' ? '#fff' : '#94a3b8',
-              border: 'none',
+              background: viewMode === 'table' ? '#27272a' : 'transparent',
+              color: viewMode === 'table' ? '#fff' : 'var(--text-secondary)',
+              border: viewMode === 'table' ? '1px solid var(--border-focus)' : '1px solid transparent',
               cursor: 'pointer',
             }}
           >
@@ -146,9 +146,9 @@ export const CanvasViewport: React.FC<CanvasViewportProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              background: viewMode === 'tree' ? '#2563eb' : 'transparent',
-              color: viewMode === 'tree' ? '#fff' : '#94a3b8',
-              border: 'none',
+              background: viewMode === 'tree' ? '#27272a' : 'transparent',
+              color: viewMode === 'tree' ? '#c084fc' : 'var(--text-secondary)',
+              border: viewMode === 'tree' ? '1px solid #a855f7' : '1px solid transparent',
               cursor: 'pointer',
             }}
           >
@@ -168,10 +168,10 @@ export const CanvasViewport: React.FC<CanvasViewportProps> = ({
           display: 'flex',
           flexDirection: 'column',
           gap: '4px',
-          background: '#111827',
+          background: 'var(--bg-card)',
           padding: '4px',
           borderRadius: '6px',
-          border: '1px solid #374151',
+          border: '1px solid var(--border-subtle)',
         }}
       >
         <button
@@ -179,9 +179,9 @@ export const CanvasViewport: React.FC<CanvasViewportProps> = ({
           style={{
             padding: '5px',
             borderRadius: '4px',
-            background: '#1f2937',
-            color: '#e2e8f0',
-            border: '1px solid #374151',
+            background: 'var(--bg-tertiary)',
+            color: 'var(--text-primary)',
+            border: '1px solid var(--border-subtle)',
             cursor: 'pointer',
           }}
           title="Zoom In"
@@ -189,7 +189,7 @@ export const CanvasViewport: React.FC<CanvasViewportProps> = ({
           <ZoomIn size={14} />
         </button>
 
-        <div style={{ textAlign: 'center', fontSize: '10px', color: '#94a3b8', fontWeight: 600, padding: '2px 0' }}>
+        <div style={{ textAlign: 'center', fontSize: '10px', color: 'var(--text-secondary)', fontWeight: 600, padding: '2px 0' }}>
           {Math.round(zoom * 100)}%
         </div>
 
@@ -198,9 +198,9 @@ export const CanvasViewport: React.FC<CanvasViewportProps> = ({
           style={{
             padding: '5px',
             borderRadius: '4px',
-            background: '#1f2937',
-            color: '#e2e8f0',
-            border: '1px solid #374151',
+            background: 'var(--bg-tertiary)',
+            color: 'var(--text-primary)',
+            border: '1px solid var(--border-subtle)',
             cursor: 'pointer',
           }}
           title="Zoom Out"
@@ -213,9 +213,9 @@ export const CanvasViewport: React.FC<CanvasViewportProps> = ({
           style={{
             padding: '5px',
             borderRadius: '4px',
-            background: '#1f2937',
-            color: '#e2e8f0',
-            border: '1px solid #374151',
+            background: 'var(--bg-tertiary)',
+            color: 'var(--text-primary)',
+            border: '1px solid var(--border-subtle)',
             cursor: 'pointer',
           }}
           title="Reset Zoom & Pan"

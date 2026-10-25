@@ -30,8 +30,8 @@ export const ArrayWidget: React.FC<ArrayWidgetProps> = ({ state, pointers = {} }
   return (
     <div
       style={{
-        background: '#111827',
-        border: '1px solid #374151',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-subtle)',
         borderRadius: '6px',
         padding: '14px 16px',
         minWidth: '280px',
@@ -53,7 +53,7 @@ export const ArrayWidget: React.FC<ArrayWidgetProps> = ({ state, pointers = {} }
               fontSize: '14px',
               fontWeight: 700,
               fontFamily: 'monospace',
-              color: '#38bdf8',
+              color: '#34d399',
             }}
           >
             {name}
@@ -63,9 +63,9 @@ export const ArrayWidget: React.FC<ArrayWidgetProps> = ({ state, pointers = {} }
               fontSize: '11px',
               padding: '1px 6px',
               borderRadius: '4px',
-              background: '#1f2937',
-              color: '#9ca3af',
-              border: '1px solid #374151',
+              background: 'var(--bg-tertiary)',
+              color: 'var(--text-secondary)',
+              border: '1px solid var(--border-subtle)',
             }}
           >
             vector&lt;int&gt; [{values.length}]
@@ -79,10 +79,10 @@ export const ArrayWidget: React.FC<ArrayWidgetProps> = ({ state, pointers = {} }
           style={{
             padding: '16px',
             textAlign: 'center',
-            color: '#6b7280',
+            color: 'var(--text-muted)',
             fontSize: '12px',
             fontStyle: 'italic',
-            border: '1px dashed #374151',
+            border: '1px dashed var(--border-subtle)',
             borderRadius: '4px',
           }}
         >
@@ -103,9 +103,9 @@ export const ArrayWidget: React.FC<ArrayWidgetProps> = ({ state, pointers = {} }
             const isRead = readIndices.includes(idx);
             const matchingPointers = getPointersForIndex(idx);
 
-            let bg = '#1f2937';
-            let borderColor = '#374151';
-            let textColor = '#f3f4f6';
+            let bg = 'var(--bg-tertiary)';
+            let borderColor = 'var(--border-subtle)';
+            let textColor = 'var(--text-primary)';
 
             if (isActive) {
               bg = '#78350f';

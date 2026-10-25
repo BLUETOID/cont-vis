@@ -19,8 +19,8 @@ export const ScalarWatchWidget: React.FC<ScalarWatchWidgetProps> = ({ scalars })
   return (
     <div
       style={{
-        background: '#111827',
-        border: '1px solid #374151',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-subtle)',
         borderRadius: '6px',
         padding: '10px 14px',
         minWidth: '200px',
@@ -36,12 +36,12 @@ export const ScalarWatchWidget: React.FC<ScalarWatchWidgetProps> = ({ scalars })
           marginBottom: '8px',
         }}
       >
-        <Eye size={13} color="#9ca3af" />
+        <Eye size={13} color="var(--text-secondary)" />
         <span
           style={{
             fontSize: '11px',
             fontWeight: 700,
-            color: '#9ca3af',
+            color: 'var(--text-secondary)',
             textTransform: 'uppercase',
             letterSpacing: '0.05em',
             fontFamily: 'monospace',
@@ -63,7 +63,7 @@ export const ScalarWatchWidget: React.FC<ScalarWatchWidgetProps> = ({ scalars })
           const isBool = typeof val === 'boolean';
           const isNum = typeof val === 'number';
 
-          let valColor = '#38bdf8';
+          let valColor = '#34d399';
           if (isBool) valColor = val ? '#34d399' : '#f87171';
           else if (isNum) valColor = '#fbbf24';
 
@@ -74,15 +74,15 @@ export const ScalarWatchWidget: React.FC<ScalarWatchWidgetProps> = ({ scalars })
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                background: '#1f2937',
-                border: '1px solid #374151',
+                background: 'var(--bg-tertiary)',
+                border: '1px solid var(--border-subtle)',
                 borderRadius: '4px',
                 padding: '3px 8px',
                 fontSize: '11px',
                 fontFamily: 'monospace',
               }}
             >
-              <span style={{ color: '#9ca3af', fontWeight: 600 }}>{key}:</span>
+              <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{key}:</span>
               <span style={{ color: valColor, fontWeight: 700 }}>
                 {String(val)}
               </span>

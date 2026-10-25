@@ -212,7 +212,7 @@ export const DPTableView: React.FC<DPTableViewProps> = ({ table, backtrackPath =
                     width: `${CELL_WIDTH}px`,
                     height: `${HEADER_HEIGHT}px`,
                     background: 'var(--bg-secondary)',
-                    color: 'var(--accent-cyan)',
+                    color: 'var(--accent-emerald)',
                     fontSize: '11px',
                     fontWeight: 700,
                     textAlign: 'center',
@@ -263,24 +263,21 @@ export const DPTableView: React.FC<DPTableViewProps> = ({ table, backtrackPath =
                   let cellBg = 'var(--bg-secondary)';
                   let cellBorder = '1px solid var(--border-subtle)';
                   let cellColor = hasValue ? 'var(--text-primary)' : 'var(--text-muted)';
-                  let extraShadow = 'none';
 
                   if (isActive) {
                     cellBg = 'rgba(245, 158, 11, 0.25)';
                     cellBorder = '2px solid #fbbf24';
                     cellColor = '#fef08a';
-                    extraShadow = '0 0 16px rgba(245, 158, 11, 0.6)';
                   } else if (isBacktrack) {
-                    cellBg = 'rgba(6, 182, 212, 0.25)';
-                    cellBorder = '2px solid #22d3ee';
-                    cellColor = '#67e8f9';
-                    extraShadow = '0 0 14px rgba(6, 182, 212, 0.5)';
+                    cellBg = 'rgba(16, 185, 129, 0.25)';
+                    cellBorder = '2px solid #34d399';
+                    cellColor = '#a7f3d0';
                   } else if (isReadDep) {
-                    cellBg = 'rgba(139, 92, 246, 0.2)';
-                    cellBorder = '2px solid #a78bfa';
+                    cellBg = 'rgba(168, 85, 247, 0.2)';
+                    cellBorder = '2px solid #a855f7';
                     cellColor = '#c4b5fd';
                   } else if (hasValue) {
-                    cellBg = 'rgba(30, 41, 59, 0.85)';
+                    cellBg = 'var(--bg-tertiary)';
                   }
 
                   return (
@@ -296,7 +293,6 @@ export const DPTableView: React.FC<DPTableViewProps> = ({ table, backtrackPath =
                         fontWeight: isActive || isBacktrack ? 700 : 500,
                         textAlign: 'center',
                         borderRadius: 'var(--radius-sm)',
-                        boxShadow: extraShadow,
                         position: 'relative',
                         transition: 'all 0.15s ease-out',
                       }}

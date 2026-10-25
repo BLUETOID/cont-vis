@@ -16,8 +16,8 @@ export const MatrixWidget: React.FC<MatrixWidgetProps> = ({ state }) => {
   return (
     <div
       style={{
-        background: '#111827',
-        border: '1px solid #374151',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-subtle)',
         borderRadius: '6px',
         padding: '14px 16px',
         minWidth: '300px',
@@ -49,9 +49,9 @@ export const MatrixWidget: React.FC<MatrixWidgetProps> = ({ state }) => {
               fontSize: '11px',
               padding: '1px 6px',
               borderRadius: '4px',
-              background: '#1f2937',
-              color: '#9ca3af',
-              border: '1px solid #374151',
+              background: 'var(--bg-tertiary)',
+              color: 'var(--text-secondary)',
+              border: '1px solid var(--border-subtle)',
             }}
           >
             vector&lt;vector&lt;int&gt;&gt; [{rows}×{cols}]
@@ -80,7 +80,7 @@ export const MatrixWidget: React.FC<MatrixWidgetProps> = ({ state }) => {
                 style={{
                   width: '36px',
                   height: '24px',
-                  color: '#6b7280',
+                  color: 'var(--text-muted)',
                   fontSize: '10px',
                 }}
               >
@@ -97,8 +97,8 @@ export const MatrixWidget: React.FC<MatrixWidgetProps> = ({ state }) => {
                       textAlign: 'center',
                       fontSize: '10px',
                       fontWeight: isColActive ? 700 : 500,
-                      color: isColActive ? '#f59e0b' : '#9ca3af',
-                      background: isColActive ? '#78350f' : '#1f2937',
+                      color: isColActive ? '#f59e0b' : 'var(--text-secondary)',
+                      background: isColActive ? '#78350f' : 'var(--bg-tertiary)',
                       borderRadius: '3px',
                     }}
                   >
@@ -121,8 +121,8 @@ export const MatrixWidget: React.FC<MatrixWidgetProps> = ({ state }) => {
                       textAlign: 'center',
                       fontSize: '10px',
                       fontWeight: isRowActive ? 700 : 500,
-                      color: isRowActive ? '#f59e0b' : '#9ca3af',
-                      background: isRowActive ? '#78350f' : '#1f2937',
+                      color: isRowActive ? '#f59e0b' : 'var(--text-secondary)',
+                      background: isRowActive ? '#78350f' : 'var(--bg-tertiary)',
                       borderRadius: '3px',
                     }}
                   >
@@ -135,9 +135,9 @@ export const MatrixWidget: React.FC<MatrixWidgetProps> = ({ state }) => {
                     const isActive = activeCell?.r === r && activeCell?.c === c;
                     const isRead = readCells.some((rc) => rc.r === r && rc.c === c);
 
-                    let bg = '#1f2937';
-                    let borderColor = '#374151';
-                    let textColor = '#f3f4f6';
+                    let bg = 'var(--bg-tertiary)';
+                    let borderColor = 'var(--border-subtle)';
+                    let textColor = 'var(--text-primary)';
 
                     if (isActive) {
                       bg = '#78350f';

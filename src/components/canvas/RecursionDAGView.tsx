@@ -59,7 +59,7 @@ export const RecursionDAGView: React.FC<RecursionDAGViewProps> = ({ tree }) => {
             markerHeight="6"
             orient="auto"
           >
-            <path d="M 0 2 L 8 5 L 0 8 z" fill="#475569" />
+            <path d="M 0 2 L 8 5 L 0 8 z" fill="#52525b" />
           </marker>
         </defs>
 
@@ -76,7 +76,7 @@ export const RecursionDAGView: React.FC<RecursionDAGViewProps> = ({ tree }) => {
           const dy = (endY - startY) * 0.5;
 
           const isMemoHit = node.status === 'memo_hit';
-          const strokeColor = isMemoHit ? '#34d399' : '#334155';
+          const strokeColor = isMemoHit ? '#34d399' : '#3f3f46';
 
           return (
             <path
@@ -134,14 +134,14 @@ export const RecursionDAGView: React.FC<RecursionDAGViewProps> = ({ tree }) => {
                   ? '2px solid #10b981'
                   : isActive
                   ? '2px solid #f59e0b'
-                  : '1px solid #374151',
+                  : '1px solid var(--border-subtle)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
                 fontFamily: 'monospace',
                 fontSize: '12px',
                 fontWeight: 600,
-                color: isMemoHit ? '#34d399' : isActive ? '#fbbf24' : '#f3f4f6',
+                color: isMemoHit ? '#34d399' : isActive ? '#fbbf24' : 'var(--text-bright)',
                 whiteSpace: 'nowrap',
               }}
             >
@@ -149,8 +149,9 @@ export const RecursionDAGView: React.FC<RecursionDAGViewProps> = ({ tree }) => {
               {hasReturn && (
                 <span
                   style={{
-                    background: '#1e3a8a',
-                    color: '#93c5fd',
+                    background: 'var(--bg-tertiary)',
+                    color: '#34d399',
+                    border: '1px solid #10b981',
                     padding: '1px 6px',
                     borderRadius: '4px',
                     fontSize: '11px',

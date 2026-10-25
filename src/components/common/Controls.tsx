@@ -180,7 +180,7 @@ export const Controls: React.FC<ControlsProps> = ({
           style={{
             width: '100%',
             height: '6px',
-            accentColor: 'var(--accent-cyan)',
+            accentColor: 'var(--accent-emerald)',
             cursor: totalSteps > 1 ? 'pointer' : 'default',
           }}
         />

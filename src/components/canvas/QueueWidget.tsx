@@ -17,8 +17,8 @@ export const QueueWidget: React.FC<QueueWidgetProps> = ({ state }) => {
   return (
     <div
       style={{
-        background: '#111827',
-        border: '1px solid #374151',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-subtle)',
         borderRadius: '6px',
         padding: '14px 16px',
         minWidth: '280px',
@@ -35,13 +35,13 @@ export const QueueWidget: React.FC<QueueWidgetProps> = ({ state }) => {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <MoveHorizontal size={15} color="#0ea5e9" />
+          <MoveHorizontal size={15} color="#10b981" />
           <span
             style={{
               fontSize: '14px',
               fontWeight: 700,
               fontFamily: 'monospace',
-              color: '#38bdf8',
+              color: '#34d399',
             }}
           >
             {name}
@@ -51,9 +51,9 @@ export const QueueWidget: React.FC<QueueWidgetProps> = ({ state }) => {
               fontSize: '11px',
               padding: '1px 6px',
               borderRadius: '4px',
-              background: '#1f2937',
-              color: '#9ca3af',
-              border: '1px solid #374151',
+              background: 'var(--bg-tertiary)',
+              color: 'var(--text-secondary)',
+              border: '1px solid var(--border-subtle)',
             }}
           >
             queue&lt;int&gt; [{items.length}]
@@ -68,9 +68,9 @@ export const QueueWidget: React.FC<QueueWidgetProps> = ({ state }) => {
           alignItems: 'center',
           gap: '8px',
           padding: '8px 10px',
-          background: '#0c4a6e15',
-          borderTop: '2px solid #0ea5e9',
-          borderBottom: '2px solid #0ea5e9',
+          background: 'rgba(16, 185, 129, 0.05)',
+          borderTop: '2px solid #10b981',
+          borderBottom: '2px solid #10b981',
           borderRadius: '4px',
           overflowX: 'auto',
         }}
@@ -83,10 +83,10 @@ export const QueueWidget: React.FC<QueueWidgetProps> = ({ state }) => {
             alignItems: 'center',
             fontSize: '9px',
             fontWeight: 800,
-            color: '#38bdf8',
+            color: '#34d399',
             fontFamily: 'monospace',
             paddingRight: '6px',
-            borderRight: '1px solid #374151',
+            borderRight: '1px solid var(--border-subtle)',
           }}
         >
           <span>FRONT</span>
@@ -96,7 +96,7 @@ export const QueueWidget: React.FC<QueueWidgetProps> = ({ state }) => {
         {items.length === 0 ? (
           <div
             style={{
-              color: '#6b7280',
+              color: 'var(--text-muted)',
               fontSize: '11px',
               fontStyle: 'italic',
               margin: 'auto',
@@ -115,8 +115,8 @@ export const QueueWidget: React.FC<QueueWidgetProps> = ({ state }) => {
                   width: '44px',
                   height: '44px',
                   minWidth: '44px',
-                  background: isFront ? '#0c4a6e' : '#1f2937',
-                  border: isFront ? '1.5px solid #0ea5e9' : '1px solid #374151',
+                  background: isFront ? '#064e3b' : 'var(--bg-tertiary)',
+                  border: isFront ? '1.5px solid #10b981' : '1px solid var(--border-subtle)',
                   borderRadius: '4px',
                   display: 'flex',
                   alignItems: 'center',
@@ -124,7 +124,7 @@ export const QueueWidget: React.FC<QueueWidgetProps> = ({ state }) => {
                   fontSize: '15px',
                   fontWeight: 700,
                   fontFamily: 'monospace',
-                  color: isFront ? '#bae6fd' : '#f3f4f6',
+                  color: isFront ? '#d1fae5' : 'var(--text-primary)',
                 }}
               >
                 {String(val)}
@@ -141,10 +141,10 @@ export const QueueWidget: React.FC<QueueWidgetProps> = ({ state }) => {
             alignItems: 'center',
             fontSize: '9px',
             fontWeight: 800,
-            color: '#0ea5e9',
+            color: '#10b981',
             fontFamily: 'monospace',
             paddingLeft: '6px',
-            borderLeft: '1px solid #374151',
+            borderLeft: '1px solid var(--border-subtle)',
           }}
         >
           <span>BACK</span>

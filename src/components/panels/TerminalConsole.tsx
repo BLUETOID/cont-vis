@@ -33,7 +33,7 @@ export const TerminalConsole: React.FC<TerminalConsoleProps> = ({ stdout, onClea
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <Terminal size={14} color="var(--accent-cyan)" />
+          <Terminal size={14} color="#10b981" />
           <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-bright)' }}>
             Terminal (stdout)
           </span>
@@ -54,6 +54,7 @@ export const TerminalConsole: React.FC<TerminalConsoleProps> = ({ stdout, onClea
         style={{
           flex: 1,
           background: 'var(--bg-primary)',
+          border: '1px solid var(--border-subtle)',
           borderRadius: 'var(--radius-sm)',
           padding: '8px 10px',
           overflowY: 'auto',

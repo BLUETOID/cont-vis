@@ -28,18 +28,18 @@ export const DataStructureCanvas: React.FC<DataStructureCanvasProps> = ({ snapsh
           alignItems: 'center',
           justifyContent: 'center',
           padding: '40px 30px',
-          background: '#111827',
-          border: '1px solid #374151',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-subtle)',
           borderRadius: '8px',
           maxWidth: '480px',
           textAlign: 'center',
         }}
       >
-        <Code size={30} color="#38bdf8" style={{ marginBottom: '12px' }} />
-        <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#f3f4f6', marginBottom: '6px' }}>
+        <Code size={30} color="#10b981" style={{ marginBottom: '12px' }} />
+        <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-bright)', marginBottom: '6px' }}>
           Code-Driven Visualizer
         </h3>
-        <p style={{ fontSize: '12px', color: '#9ca3af', lineHeight: 1.5 }}>
+        <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
           Write any C++ code or select a template above. Click <strong>Run Code (Ctrl+↵)</strong> to execute and visualize data structures.
         </p>
       </div>
@@ -70,18 +70,18 @@ export const DataStructureCanvas: React.FC<DataStructureCanvasProps> = ({ snapsh
           alignItems: 'center',
           justifyContent: 'center',
           padding: '40px 30px',
-          background: '#111827',
-          border: '1px solid #374151',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-subtle)',
           borderRadius: '8px',
           maxWidth: '480px',
           textAlign: 'center',
         }}
       >
-        <Terminal size={30} color="#38bdf8" style={{ marginBottom: '12px' }} />
-        <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#f3f4f6', marginBottom: '6px' }}>
+        <Terminal size={30} color="#10b981" style={{ marginBottom: '12px' }} />
+        <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-bright)', marginBottom: '6px' }}>
           Execution Completed
         </h3>
-        <p style={{ fontSize: '12px', color: '#9ca3af', lineHeight: 1.5 }}>
+        <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
           No active data structures were declared in this step.
         </p>
       </div>

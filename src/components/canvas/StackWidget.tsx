@@ -17,8 +17,8 @@ export const StackWidget: React.FC<StackWidgetProps> = ({ state }) => {
   return (
     <div
       style={{
-        background: '#111827',
-        border: '1px solid #374151',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-subtle)',
         borderRadius: '6px',
         padding: '14px 16px',
         minWidth: '200px',
@@ -52,9 +52,9 @@ export const StackWidget: React.FC<StackWidgetProps> = ({ state }) => {
               fontSize: '11px',
               padding: '1px 6px',
               borderRadius: '4px',
-              background: '#1f2937',
-              color: '#9ca3af',
-              border: '1px solid #374151',
+              background: 'var(--bg-tertiary)',
+              color: 'var(--text-secondary)',
+              border: '1px solid var(--border-subtle)',
             }}
           >
             stack&lt;int&gt; [{items.length}]
@@ -76,14 +76,14 @@ export const StackWidget: React.FC<StackWidgetProps> = ({ state }) => {
           flexDirection: 'column-reverse',
           gap: '6px',
           overflowY: 'auto',
-          background: '#064e3b15',
+          background: 'rgba(16, 185, 129, 0.05)',
         }}
       >
         {items.length === 0 ? (
           <div
             style={{
               margin: 'auto',
-              color: '#6b7280',
+              color: 'var(--text-muted)',
               fontSize: '11px',
               fontStyle: 'italic',
             }}
@@ -97,8 +97,8 @@ export const StackWidget: React.FC<StackWidgetProps> = ({ state }) => {
               <div
                 key={idx}
                 style={{
-                  background: isTop ? '#064e3b' : '#1f2937',
-                  border: isTop ? '1.5px solid #10b981' : '1px solid #374151',
+                  background: isTop ? '#064e3b' : 'var(--bg-tertiary)',
+                  border: isTop ? '1.5px solid #10b981' : '1px solid var(--border-subtle)',
                   borderRadius: '4px',
                   padding: '6px 10px',
                   display: 'flex',

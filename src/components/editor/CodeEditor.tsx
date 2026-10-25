@@ -83,7 +83,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <Code2 size={15} color="var(--accent-cyan)" />
+          <Code2 size={15} color="#10b981" />
           <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-bright)' }}>
             C++ Solution Source
           </span>
@@ -98,11 +98,11 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              padding: '4px 12px',
+              padding: '5px 14px',
               borderRadius: '6px',
               fontSize: '12px',
               fontWeight: 700,
-              background: '#2563eb',
+              background: '#10b981',
               color: '#ffffff',
               border: 'none',
               cursor: 'pointer',

@@ -27,7 +27,7 @@ export const CallStackPanel: React.FC<CallStackPanelProps> = ({ callStack }) => 
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <Layers size={15} color="var(--accent-indigo)" />
+          <Layers size={15} color="#a855f7" />
           <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-bright)' }}>
             Call Stack ({callStack.length})
           </span>
@@ -55,8 +55,8 @@ export const CallStackPanel: React.FC<CallStackPanelProps> = ({ callStack }) => 
               <div
                 key={idx}
                 style={{
-                  background: idx === 0 ? 'rgba(79, 70, 229, 0.15)' : 'var(--bg-primary)',
-                  border: idx === 0 ? '1px solid var(--border-focus)' : '1px solid var(--border-subtle)',
+                  background: idx === 0 ? 'rgba(168, 85, 247, 0.15)' : 'var(--bg-primary)',
+                  border: idx === 0 ? '1px solid #a855f7' : '1px solid var(--border-subtle)',
                   borderRadius: 'var(--radius-sm)',
                   padding: '6px 10px',
                   fontSize: '11px',

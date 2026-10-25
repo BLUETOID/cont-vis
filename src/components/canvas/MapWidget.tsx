@@ -17,8 +17,8 @@ export const MapWidget: React.FC<MapWidgetProps> = ({ state }) => {
   return (
     <div
       style={{
-        background: '#111827',
-        border: '1px solid #374151',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-subtle)',
         borderRadius: '6px',
         padding: '14px 16px',
         minWidth: '260px',
@@ -51,9 +51,9 @@ export const MapWidget: React.FC<MapWidgetProps> = ({ state }) => {
               fontSize: '11px',
               padding: '1px 6px',
               borderRadius: '4px',
-              background: '#1f2937',
-              color: '#9ca3af',
-              border: '1px solid #374151',
+              background: 'var(--bg-tertiary)',
+              color: 'var(--text-secondary)',
+              border: '1px solid var(--border-subtle)',
             }}
           >
             unordered_map [{entries.length}]
@@ -67,10 +67,10 @@ export const MapWidget: React.FC<MapWidgetProps> = ({ state }) => {
           style={{
             padding: '14px',
             textAlign: 'center',
-            color: '#6b7280',
+            color: 'var(--text-muted)',
             fontSize: '11px',
             fontStyle: 'italic',
-            border: '1px dashed #374151',
+            border: '1px dashed var(--border-subtle)',
             borderRadius: '4px',
           }}
         >
@@ -92,8 +92,8 @@ export const MapWidget: React.FC<MapWidgetProps> = ({ state }) => {
               <div
                 key={idx}
                 style={{
-                  background: isActive ? '#78350f' : '#1f2937',
-                  border: isActive ? '1.5px solid #f59e0b' : '1px solid #374151',
+                  background: isActive ? '#78350f' : 'var(--bg-tertiary)',
+                  border: isActive ? '1.5px solid #f59e0b' : '1px solid var(--border-subtle)',
                   borderRadius: '4px',
                   padding: '6px 8px',
                   display: 'flex',

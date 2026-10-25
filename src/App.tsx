@@ -41,6 +41,29 @@ export function App() {
   const [activeLeftTab, setActiveLeftTab] = useState<'input' | 'terminal' | 'callstack'>('terminal');
   const [activeCanvasView, setActiveCanvasView] = useState<'structures' | 'recursion'>('structures');
 
+  // Adjustable Resizable Pane Width
+  const [leftWidth, setLeftWidth] = useState<number>(44);
+  const [isDraggingDivider, setIsDraggingDivider] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!isDraggingDivider) return;
+    const handleMouseMove = (e: MouseEvent) => {
+      const newPercent = (e.clientX / window.innerWidth) * 100;
+      if (newPercent >= 20 && newPercent <= 80) {
+        setLeftWidth(newPercent);
+      }
+    };
+    const handleMouseUp = () => {
+      setIsDraggingDivider(false);
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDraggingDivider]);
+
   // Check if current trace has recursion
   const hasRecursion = useMemo(() => {
     return trace.some((s) => s.recursionTree && Object.keys(s.recursionTree.nodes).length > 1);
@@ -131,7 +154,7 @@ export function App() {
   const currentStepStdout = currentSnapshot ? currentSnapshot.stdout : stdout;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100vw', background: '#0a0f1d', color: '#f8fafc' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100vw', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
       {/* 1. Top Navigation Bar */}
       <Header
         currentTemplateId={currentTemplateId}
@@ -144,21 +167,22 @@ export function App() {
         stdout={stdout}
       />
 
-      {/* 2. Main 2-Pane Workspace */}
-      <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-        {/* Left Column: Monaco Code Editor + Tabs (Input, Output, CallStack) (42% width) */}
+      {/* 2. Main 2-Pane Workspace with Adjustable Splitter */}
+      <div style={{ flex: 1, display: 'flex', overflow: 'hidden', position: 'relative' }}>
+        {/* Left Column: Monaco Code Editor + Tabs (Input, Output, CallStack) */}
         <div
           style={{
-            width: '42%',
-            minWidth: '380px',
-            borderRight: '1px solid #1e293b',
+            width: `${leftWidth}%`,
+            minWidth: '320px',
+            maxWidth: '75%',
             display: 'flex',
             flexDirection: 'column',
-            background: '#0d1527',
+            background: 'var(--bg-secondary)',
+            overflow: 'hidden',
           }}
         >
           {/* Top 62%: Monaco Editor */}
-          <div style={{ flex: '1 1 62%', minHeight: '260px' }}>
+          <div style={{ flex: '1 1 60%', minHeight: '240px' }}>
             <CodeEditor
               code={code}
               onChangeCode={setCode}
@@ -170,20 +194,20 @@ export function App() {
           {/* Bottom 38%: Tabbed Panels (Input, Output, Call Stack) */}
           <div
             style={{
-              flex: '1 1 38%',
+              flex: '1 1 40%',
               minHeight: '170px',
-              borderTop: '1px solid #1e293b',
+              borderTop: '1px solid var(--border-subtle)',
               display: 'flex',
               flexDirection: 'column',
-              background: '#0a0f1d',
+              background: 'var(--bg-primary)',
             }}
           >
             {/* Tabs Header */}
             <div
               style={{
                 display: 'flex',
-                background: '#111827',
-                borderBottom: '1px solid #1e293b',
+                background: 'var(--bg-card)',
+                borderBottom: '1px solid var(--border-subtle)',
                 padding: '0 8px',
               }}
             >
@@ -194,8 +218,8 @@ export function App() {
                     padding: '7px 12px',
                     fontSize: '12px',
                     fontWeight: 600,
-                    borderBottom: activeLeftTab === 'input' ? '2px solid #38bdf8' : 'none',
-                    color: activeLeftTab === 'input' ? '#38bdf8' : '#94a3b8',
+                    borderBottom: activeLeftTab === 'input' ? '2px solid #10b981' : '2px solid transparent',
+                    color: activeLeftTab === 'input' ? '#34d399' : 'var(--text-secondary)',
                     background: 'transparent',
                     borderTop: 'none',
                     borderLeft: 'none',
@@ -212,8 +236,8 @@ export function App() {
                   padding: '7px 12px',
                   fontSize: '12px',
                   fontWeight: 600,
-                  borderBottom: activeLeftTab === 'terminal' ? '2px solid #34d399' : 'none',
-                  color: activeLeftTab === 'terminal' ? '#34d399' : '#94a3b8',
+                  borderBottom: activeLeftTab === 'terminal' ? '2px solid #10b981' : '2px solid transparent',
+                  color: activeLeftTab === 'terminal' ? '#34d399' : 'var(--text-secondary)',
                   background: 'transparent',
                   borderTop: 'none',
                   borderLeft: 'none',
@@ -229,8 +253,8 @@ export function App() {
                   padding: '7px 12px',
                   fontSize: '12px',
                   fontWeight: 600,
-                  borderBottom: activeLeftTab === 'callstack' ? '2px solid #3b82f6' : 'none',
-                  color: activeLeftTab === 'callstack' ? '#60a5fa' : '#94a3b8',
+                  borderBottom: activeLeftTab === 'callstack' ? '2px solid #a855f7' : '2px solid transparent',
+                  color: activeLeftTab === 'callstack' ? '#c084fc' : 'var(--text-secondary)',
                   background: 'transparent',
                   borderTop: 'none',
                   borderLeft: 'none',
@@ -264,8 +288,23 @@ export function App() {
           </div>
         </div>
 
-        {/* Right Column: Infinite Vector Canvas with Optional Recursion Tab (58% width) */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative' }}>
+        {/* Adjustable Splitter Divider */}
+        <div
+          onMouseDown={() => setIsDraggingDivider(true)}
+          style={{
+            width: '6px',
+            cursor: 'col-resize',
+            background: isDraggingDivider ? '#10b981' : 'var(--border-subtle)',
+            transition: 'background 0.15s ease',
+            position: 'relative',
+            zIndex: 30,
+            userSelect: 'none',
+          }}
+          title="Drag to resize editor and visualizer panels"
+        />
+
+        {/* Right Column: Infinite Vector Canvas with Optional Recursion Tab */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative', background: 'var(--bg-primary)', overflow: 'hidden' }}>
           {/* Top Switcher Bar (Only shown when code has recursive calls) */}
           {hasRecursion && (
             <div
@@ -273,13 +312,13 @@ export function App() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                background: '#111827',
-                borderBottom: '1px solid #1e293b',
+                background: 'var(--bg-card)',
+                borderBottom: '1px solid var(--border-subtle)',
                 padding: '6px 16px',
                 zIndex: 10,
               }}
             >
-              <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>View:</span>
+              <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600 }}>View:</span>
               <button
                 onClick={() => setActiveCanvasView('structures')}
                 style={{
@@ -289,9 +328,9 @@ export function App() {
                   padding: '4px 10px',
                   fontSize: '11px',
                   fontWeight: 600,
-                  background: activeCanvasView === 'structures' ? '#1e293b' : 'transparent',
-                  color: activeCanvasView === 'structures' ? '#38bdf8' : '#94a3b8',
-                  border: '1px solid ' + (activeCanvasView === 'structures' ? '#38bdf8' : '#334155'),
+                  background: activeCanvasView === 'structures' ? 'var(--bg-card-hover)' : 'transparent',
+                  color: activeCanvasView === 'structures' ? 'var(--text-bright)' : 'var(--text-secondary)',
+                  border: '1px solid ' + (activeCanvasView === 'structures' ? 'var(--border-focus)' : 'var(--border-subtle)'),
                   borderRadius: '4px',
                   cursor: 'pointer',
                 }}
@@ -308,9 +347,9 @@ export function App() {
                   padding: '4px 10px',
                   fontSize: '11px',
                   fontWeight: 600,
-                  background: activeCanvasView === 'recursion' ? '#1e293b' : 'transparent',
-                  color: activeCanvasView === 'recursion' ? '#a78bfa' : '#94a3b8',
-                  border: '1px solid ' + (activeCanvasView === 'recursion' ? '#8b5cf6' : '#334155'),
+                  background: activeCanvasView === 'recursion' ? 'var(--bg-card-hover)' : 'transparent',
+                  color: activeCanvasView === 'recursion' ? '#c084fc' : 'var(--text-secondary)',
+                  border: '1px solid ' + (activeCanvasView === 'recursion' ? '#a855f7' : 'var(--border-subtle)'),
                   borderRadius: '4px',
                   cursor: 'pointer',
                 }}
