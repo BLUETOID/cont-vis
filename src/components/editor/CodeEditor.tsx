@@ -4,7 +4,7 @@
 
 import React, { useRef, useEffect } from 'react';
 import Editor, { type OnMount } from '@monaco-editor/react';
-import { Code2 } from 'lucide-react';
+import { Code2, Play } from 'lucide-react';
 
 interface CodeEditorProps {
   code: string;
@@ -88,9 +88,32 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
             C++ Solution Source
           </span>
         </div>
-        <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-          Press <strong>Ctrl + Enter</strong> to execute
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+            <strong>Ctrl + Enter</strong>
+          </span>
+          <button
+            onClick={onRun}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '4px 12px',
+              borderRadius: '6px',
+              fontSize: '12px',
+              fontWeight: 700,
+              background: '#2563eb',
+              color: '#ffffff',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'background 0.15s ease',
+            }}
+            title="Run C++ Code (Ctrl + Enter)"
+          >
+            <Play size={12} fill="#ffffff" />
+            Run
+          </button>
+        </div>
       </div>
 
       <div style={{ flex: 1, position: 'relative' }}>
