@@ -200,6 +200,16 @@ export function tokenize(source: string): Token[] {
     }
 
     // Multi-character operators
+    // Three-character operators (must check before two-character)
+    const threeChars = source.slice(pos, pos + 3);
+    if (['<<=', '>>='].includes(threeChars)) {
+      advance();
+      advance();
+      advance();
+      tokens.push({ type: 'OPERATOR', value: threeChars, line: startLine, col: startCol });
+      continue;
+    }
+
     const twoChars = source.slice(pos, pos + 2);
     if (
       [
@@ -216,6 +226,9 @@ export function tokenize(source: string): Token[] {
         '*=',
         '/=',
         '%=',
+        '&=',
+        '|=',
+        '^=',
         '<<',
         '>>',
         '->',

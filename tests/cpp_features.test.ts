@@ -553,5 +553,40 @@ describe('Comprehensive C++ Language & STL Features', () => {
       expect(res.error).toBeUndefined();
       expect(res.stdout).toContain('descending: 9 5 4');
     });
+
+    it('should support compound assignments including bitwise and for-loop update', () => {
+      const code = `
+        #include <iostream>
+        #include <vector>
+        using namespace std;
+        int main() {
+          int sum = 0;
+          for (int i = 0; i < 10; i += 2) {
+            sum += i;
+          }
+
+          int a = 15; a &= 6;
+          int b = 5;  b |= 3;
+          int c = 7;  c ^= 3;
+          int d = 1;  d <<= 3;
+          int e = 16; e >>= 2;
+
+          pair<int, int> p = {10, 20};
+          p.first += 5;
+          p.second -= 3;
+
+          vector<int> v = {10, 20};
+          v[0] += 5;
+          v[1] *= 2;
+
+          cout << "sum=" << sum << " a=" << a << " b=" << b << " c=" << c << " d=" << d << " e=" << e;
+          cout << " p=" << p.first << "," << p.second << " v=" << v[0] << "," << v[1] << endl;
+          return 0;
+        }
+      `;
+      const res = runCppDPInterpreter(code);
+      expect(res.error).toBeUndefined();
+      expect(res.stdout).toContain('sum=20 a=6 b=7 c=4 d=8 e=4 p=15,17 v=15,40');
+    });
   });
 });

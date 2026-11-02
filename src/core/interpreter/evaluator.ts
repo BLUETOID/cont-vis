@@ -675,6 +675,38 @@ export class Evaluator {
     }));
   }
 
+  /**
+   * Execute a node that may be either a statement (e.g. CompoundAssignmentStatement)
+   * or an expression (e.g. UpdateExpression). Used for for-loop update clauses
+   * which can contain assignments parsed as statement nodes.
+   */
+  private executeOrEvaluate(node: BaseASTNode, scope: Scope): any {
+    const STATEMENT_TYPES = new Set([
+      'AssignmentStatement',
+      'CompoundAssignmentStatement',
+      'IndexAssignmentStatement',
+      'MemberAssignmentStatement',
+      'VariableDeclaration',
+      'ExpressionStatement',
+    ]);
+
+    if (node.type === 'SequenceExpression') {
+      const seq = node as any;
+      let lastVal: any = null;
+      for (const e of seq.expressions) {
+        lastVal = this.executeOrEvaluate(e, scope);
+      }
+      return lastVal;
+    }
+
+    if (STATEMENT_TYPES.has(node.type)) {
+      this.executeStatement(node, scope);
+      return null;
+    }
+
+    return this.evaluateExpression(node, scope);
+  }
+
   private executeStatement(stmt: BaseASTNode, scope: Scope): void {
     this.activeScope = scope;
 
@@ -820,10 +852,12 @@ export class Evaluator {
       case 'CompoundAssignmentStatement': {
         const compound = stmt as CompoundAssignmentStatementNode;
         const rightVal = this.evaluateExpression(compound.value, scope);
+        const binOp = compound.operator.replace(/=$/, '');
+
         if (compound.target.type === 'Identifier') {
           const varName = (compound.target as IdentifierNode).name;
           const currentVal = scope.get(varName);
-          const newVal = this.applyBinaryOp(compound.operator.replace('=', ''), currentVal, rightVal);
+          const newVal = this.applyBinaryOp(binOp, currentVal, rightVal);
           scope.set(varName, newVal);
 
           this.recordStep(
@@ -831,6 +865,68 @@ export class Evaluator {
             'compute',
             `${varName} ${compound.operator} ${rightVal} -> ${newVal}`
           );
+        } else if (compound.target.type === 'MemberAccessExpression') {
+          const mem = compound.target as MemberAccessExpressionNode;
+          const obj = this.evaluateExpression(mem.object, scope);
+          const objName = this.extractIdentifierName(mem.object) || 'obj';
+          let currentVal: any;
+          if (Array.isArray(obj) && (mem.property === 'first' || mem.property === 'second')) {
+            const idx = mem.property === 'first' ? 0 : 1;
+            currentVal = obj[idx];
+            const newVal = this.applyBinaryOp(binOp, currentVal, rightVal);
+            obj[idx] = newVal;
+            this.recordStep(
+              stmt.line,
+              'compute',
+              `${objName}.${mem.property} ${compound.operator} ${rightVal} -> ${newVal}`
+            );
+          } else if (obj && typeof obj === 'object') {
+            currentVal = obj[mem.property];
+            const newVal = this.applyBinaryOp(binOp, currentVal, rightVal);
+            obj[mem.property] = newVal;
+            this.recordStep(
+              stmt.line,
+              'compute',
+              `${objName}.${mem.property} ${compound.operator} ${rightVal} -> ${newVal}`
+            );
+          }
+        } else if (compound.target.type === 'IndexAccessExpression') {
+          // Handle compound assignment on indexed elements (e.g. arr[i] += 5)
+          const indices: BaseASTNode[] = [];
+          let curr: BaseASTNode = compound.target;
+          while (curr.type === 'IndexAccessExpression') {
+            const idxAccess = curr as IndexAccessExpressionNode;
+            indices.unshift(idxAccess.index);
+            curr = idxAccess.array;
+          }
+          const arrayTarget = this.evaluateExpression(curr, scope);
+          const arrayName = curr.type === 'Identifier' ? (curr as IdentifierNode).name : 'arr';
+          const evaluatedIndices = indices.map((idxExpr) =>
+            Number(this.evaluateExpression(idxExpr, scope))
+          );
+
+          if (evaluatedIndices.length === 1) {
+            const idx = evaluatedIndices[0];
+            const currentVal = arrayTarget[idx];
+            const newVal = this.applyBinaryOp(binOp, currentVal, rightVal);
+            arrayTarget[idx] = newVal;
+            this.recordStep(
+              stmt.line,
+              'compute',
+              `${arrayName}[${idx}] ${compound.operator} ${rightVal} -> ${newVal}`
+            );
+          } else if (evaluatedIndices.length === 2) {
+            const [row, col] = evaluatedIndices;
+            if (!arrayTarget[row]) arrayTarget[row] = [];
+            const currentVal = arrayTarget[row][col];
+            const newVal = this.applyBinaryOp(binOp, currentVal, rightVal);
+            arrayTarget[row][col] = newVal;
+            this.recordStep(
+              stmt.line,
+              'compute',
+              `${arrayName}[${row}][${col}] ${compound.operator} ${rightVal} -> ${newVal}`
+            );
+          }
         }
         break;
       }
@@ -1016,7 +1112,7 @@ export class Evaluator {
 
           if (forStmt.update) {
             this.activeScope = forScope;
-            this.evaluateExpression(forStmt.update, forScope);
+            this.executeOrEvaluate(forStmt.update, forScope);
           }
         }
         break;

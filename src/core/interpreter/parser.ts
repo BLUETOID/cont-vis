@@ -637,7 +637,7 @@ export class Parser {
     if (!this.check('PUNCTUATION', ')')) {
       const updates: BaseASTNode[] = [];
       do {
-        updates.push(this.parseExpression());
+        updates.push(this.parseAssignmentExpression());
       } while (this.match('PUNCTUATION', ','));
       update =
         updates.length === 1
@@ -673,7 +673,12 @@ export class Parser {
         '-=',
         '*=',
         '/=',
-        '%='
+        '%=',
+        '&=',
+        '|=',
+        '^=',
+        '<<=',
+        '>>='
       )
     ) {
       const op = this.previous().value;
@@ -715,14 +720,24 @@ export class Parser {
       }
 
       if (expr.type === 'MemberAccessExpression') {
-        const mem = expr as MemberAccessExpressionNode;
-        return {
-          type: 'MemberAssignmentStatement',
-          object: mem.object,
-          property: mem.property,
-          value,
-          line: expr.line,
-        } as MemberAssignmentStatementNode;
+        if (op === '=') {
+          const mem = expr as MemberAccessExpressionNode;
+          return {
+            type: 'MemberAssignmentStatement',
+            object: mem.object,
+            property: mem.property,
+            value,
+            line: expr.line,
+          } as MemberAssignmentStatementNode;
+        } else {
+          return {
+            type: 'CompoundAssignmentStatement',
+            target: expr,
+            operator: op,
+            value,
+            line: expr.line,
+          } as CompoundAssignmentStatementNode;
+        }
       }
 
       if (expr.type === 'IndexAccessExpression') {
@@ -756,6 +771,94 @@ export class Parser {
   // Expression precedence climbing
   public parseExpression(): BaseASTNode {
     return this.parseConditional();
+  }
+
+  /**
+   * Parse an assignment expression (used in for-loop update, etc.)
+   * Handles: expr, expr = rhs, expr += rhs, etc.
+   */
+  private parseAssignmentExpression(): BaseASTNode {
+    const expr = this.parseExpression();
+
+    if (
+      this.match(
+        'OPERATOR',
+        '=',
+        '+=',
+        '-=',
+        '*=',
+        '/=',
+        '%=',
+        '&=',
+        '|=',
+        '^=',
+        '<<=',
+        '>>='
+      )
+    ) {
+      const op = this.previous().value;
+      const value = this.parseExpression();
+
+      if (expr.type === 'Identifier') {
+        if (op === '=') {
+          return {
+            type: 'AssignmentStatement',
+            target: (expr as IdentifierNode).name,
+            value,
+            line: expr.line,
+          } as AssignmentStatementNode;
+        } else {
+          return {
+            type: 'CompoundAssignmentStatement',
+            target: expr,
+            operator: op,
+            value,
+            line: expr.line,
+          } as CompoundAssignmentStatementNode;
+        }
+      }
+
+      if (expr.type === 'MemberAccessExpression') {
+        if (op === '=') {
+          const mem = expr as MemberAccessExpressionNode;
+          return {
+            type: 'MemberAssignmentStatement',
+            object: mem.object,
+            property: mem.property,
+            value,
+            line: expr.line,
+          } as MemberAssignmentStatementNode;
+        } else {
+          return {
+            type: 'CompoundAssignmentStatement',
+            target: expr,
+            operator: op,
+            value,
+            line: expr.line,
+          } as CompoundAssignmentStatementNode;
+        }
+      }
+
+      if (expr.type === 'IndexAccessExpression') {
+        const indices: BaseASTNode[] = [];
+        let curr: BaseASTNode = expr;
+        while (curr.type === 'IndexAccessExpression') {
+          const idxAccess = curr as IndexAccessExpressionNode;
+          indices.unshift(idxAccess.index);
+          curr = idxAccess.array;
+        }
+        return {
+          type: 'IndexAssignmentStatement',
+          array: curr,
+          indices,
+          value,
+          operator: op,
+          line: expr.line,
+        } as IndexAssignmentStatementNode;
+      }
+    }
+
+    return expr;
   }
 
   private parseConditional(): BaseASTNode {
