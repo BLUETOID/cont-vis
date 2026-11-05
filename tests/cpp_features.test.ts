@@ -588,5 +588,144 @@ describe('Comprehensive C++ Language & STL Features', () => {
       expect(res.error).toBeUndefined();
       expect(res.stdout).toContain('sum=20 a=6 b=7 c=4 d=8 e=4 p=15,17 v=15,40');
     });
+
+    it('should support monotonic stack pattern (sumSubMins) with vector constructor in comma list', () => {
+      const code = `
+        #include <bits/stdc++.h>
+        using namespace std;
+
+        int sumSubMins(vector<int> &arr) {
+            int n = arr.size();
+            vector<int> left(n), right(n);
+            stack<int> st;
+
+            for (int i = 0; i < n; i++) {
+                while (!st.empty() && arr[st.top()] >= arr[i])
+                    st.pop();
+
+                left[i] = st.empty() ? i + 1 : i - st.top();
+                st.push(i);
+            }
+
+            while (!st.empty())
+                st.pop();
+
+            for (int i = n - 1; i >= 0; i--) {
+                while (!st.empty() && arr[st.top()] > arr[i])
+                    st.pop();
+
+                right[i] = st.empty() ? n - i : st.top() - i;
+                st.push(i);
+            }
+
+            long long ans = 0;
+            for (int i = 0; i < n; i++)
+                ans += 1LL * arr[i] * left[i] * right[i];
+
+            return ans;
+        }
+
+        int main() {
+            vector<int> arr = {1, 2, 3, 4};
+            cout << sumSubMins(arr) << endl;
+            return 0;
+        }
+      `;
+      const res = runCppDPInterpreter(code);
+      expect(res.error).toBeUndefined();
+      expect(res.stdout).toContain('20');
+    });
+
+    it('should support array with fixed size and initializer', () => {
+      const code = `
+        #include <iostream>
+        using namespace std;
+        int main() {
+          int arr[3] = {10, 20, 30};
+          cout << arr[0] << " " << arr[1] << " " << arr[2] << endl;
+          return 0;
+        }
+      `;
+      const res = runCppDPInterpreter(code);
+      expect(res.error).toBeUndefined();
+      expect(res.stdout).toContain('10 20 30');
+    });
+
+    it('should support scalar constructor syntax and uniform initialization', () => {
+      const code = `
+        #include <iostream>
+        #include <vector>
+        using namespace std;
+        int main() {
+          int x(42), y(99);
+          int z{100};
+          vector<int> v{1, 2, 3};
+          cout << x << " " << y << " " << z << " " << v[1] << endl;
+          return 0;
+        }
+      `;
+      const res = runCppDPInterpreter(code);
+      expect(res.error).toBeUndefined();
+      expect(res.stdout).toContain('42 99 100 2');
+    });
+
+    it('should support comma operator in statements and for-loop init', () => {
+      const code = `
+        #include <iostream>
+        using namespace std;
+        int main() {
+          int x = 10, y = 20;
+          x += 1, y += 2;
+
+          int i, j;
+          for (i = 0, j = 10; i < j; i++, j--) {
+          }
+
+          cout << x << " " << y << " " << i << " " << j << endl;
+          return 0;
+        }
+      `;
+      const res = runCppDPInterpreter(code);
+      expect(res.error).toBeUndefined();
+      expect(res.stdout).toContain('11 22 5 5');
+    });
+
+    it('should support do-while loops', () => {
+      const code = `
+        #include <iostream>
+        using namespace std;
+        int main() {
+          int i = 0, sum = 0;
+          do {
+            sum += i;
+            i++;
+          } while (i <= 5);
+          cout << "sum=" << sum << endl;
+          return 0;
+        }
+      `;
+      const res = runCppDPInterpreter(code);
+      expect(res.error).toBeUndefined();
+      expect(res.stdout).toContain('sum=15');
+    });
+
+    it('should support string methods and conversions (to_string, stoi, substr)', () => {
+      const code = `
+        #include <iostream>
+        #include <string>
+        using namespace std;
+        int main() {
+          int x = 12345;
+          string s = to_string(x);
+          string sub = s.substr(1, 3);
+          int val = stoi(sub);
+          cout << "s=" << s << " sub=" << sub << " val=" << val << endl;
+          return 0;
+        }
+      `;
+      const res = runCppDPInterpreter(code);
+      expect(res.error).toBeUndefined();
+      expect(res.stdout).toContain('s=12345 sub=234 val=234');
+    });
   });
 });

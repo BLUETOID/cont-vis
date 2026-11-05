@@ -688,6 +688,14 @@ export class Evaluator {
       'MemberAssignmentStatement',
       'VariableDeclaration',
       'ExpressionStatement',
+      'IfStatement',
+      'WhileStatement',
+      'DoWhileStatement',
+      'ForStatement',
+      'RangeForStatement',
+      'ReturnStatement',
+      'BreakStatement',
+      'ContinueStatement',
     ]);
 
     if (node.type === 'SequenceExpression') {
@@ -766,17 +774,45 @@ export class Evaluator {
             } else {
               initVal = [0, 0];
             }
+          } else if (item.initializer) {
+            initVal = this.evaluateExpression(item.initializer, scope);
+            if (item.dimSizes && item.dimSizes.length > 0 && Array.isArray(initVal)) {
+              const dim1 = Number(this.evaluateExpression(item.dimSizes[0], scope));
+              while (initVal.length < dim1) {
+                initVal.push(0);
+              }
+            }
           } else if (item.constructorArgs && item.constructorArgs.length > 0) {
-            const size = this.evaluateExpression(item.constructorArgs[0], scope);
-            const defaultElem =
-              item.constructorArgs.length > 1
-                ? this.evaluateExpression(item.constructorArgs[1], scope)
-                : 0;
+            if (varType.startsWith('vector')) {
+              const size = this.evaluateExpression(item.constructorArgs[0], scope);
+              const defaultElem =
+                item.constructorArgs.length > 1
+                  ? this.evaluateExpression(item.constructorArgs[1], scope)
+                  : 0;
 
-            if (Array.isArray(defaultElem)) {
-              initVal = Array.from({ length: Number(size) }, () => [...defaultElem]);
+              if (Array.isArray(defaultElem)) {
+                initVal = Array.from({ length: Number(size) }, () => JSON.parse(JSON.stringify(defaultElem)));
+              } else {
+                initVal = Array.from({ length: Number(size) }, () => defaultElem);
+              }
+            } else if (varType.startsWith('string')) {
+              if (item.constructorArgs.length >= 2) {
+                const count = Number(this.evaluateExpression(item.constructorArgs[0], scope));
+                const ch = String(this.evaluateExpression(item.constructorArgs[1], scope));
+                initVal = ch.repeat(count);
+              } else {
+                initVal = String(this.evaluateExpression(item.constructorArgs[0], scope));
+              }
             } else {
-              initVal = Array.from({ length: Number(size) }, () => defaultElem);
+              // Scalar constructor like int x(42);
+              const rawVal = this.evaluateExpression(item.constructorArgs[0], scope);
+              if (varType.startsWith('bool')) {
+                initVal = Boolean(rawVal);
+              } else if (varType.startsWith('double') || varType.startsWith('float')) {
+                initVal = Number(rawVal);
+              } else {
+                initVal = Math.trunc(Number(rawVal));
+              }
             }
           } else if (item.dimSizes && item.dimSizes.length > 0) {
             const dim1 = Number(this.evaluateExpression(item.dimSizes[0], scope));
@@ -786,8 +822,6 @@ export class Evaluator {
             } else {
               initVal = Array.from({ length: dim1 }, () => 0);
             }
-          } else if (item.initializer) {
-            initVal = this.evaluateExpression(item.initializer, scope);
           } else if (item.isArray || varType.startsWith('vector')) {
             initVal = [];
           } else {
@@ -1084,11 +1118,27 @@ export class Evaluator {
         break;
       }
 
+      case 'DoWhileStatement': {
+        const doWhileStmt = stmt as any;
+        let iters = 0;
+        do {
+          if (++iters > 10000) throw new Error('Infinite do-while loop detected');
+          try {
+            this.executeStatement(doWhileStmt.body, scope);
+          } catch (e) {
+            if (e instanceof BreakSignal) break;
+            if (e instanceof ContinueSignal) continue;
+            throw e;
+          }
+        } while (Boolean(this.evaluateExpression(doWhileStmt.condition, scope)));
+        break;
+      }
+
       case 'ForStatement': {
         const forStmt = stmt as ForStatementNode;
         const forScope = new Scope(scope);
         if (forStmt.init) {
-          this.executeStatement(forStmt.init, forScope);
+          this.executeOrEvaluate(forStmt.init, forScope);
         }
         let iters = 0;
         while (true) {
@@ -1185,6 +1235,14 @@ export class Evaluator {
         if (this.stdout.length > initialStdoutLen) {
           const printed = this.stdout.slice(initialStdoutLen).trim();
           this.recordStep(exprStmt.line, 'compute', `cout << ${printed}`);
+        }
+        break;
+      }
+
+      case 'SequenceExpression': {
+        const seq = stmt as any;
+        for (const e of seq.expressions) {
+          this.executeOrEvaluate(e, scope);
         }
         break;
       }
@@ -1371,6 +1429,13 @@ export class Evaluator {
         }
         if (fnName === 'char') {
           return typeof argValues[0] === 'number' ? String.fromCharCode(argValues[0]) : String(argValues[0]);
+        }
+
+        if (fnName === 'to_string') {
+          return String(argValues[0] ?? '');
+        }
+        if (fnName === 'stoi' || fnName === 'stoll') {
+          return Math.trunc(Number(argValues[0] ?? 0));
         }
 
         if (fnName === 'max' || fnName === 'min') {
@@ -1631,6 +1696,11 @@ export class Evaluator {
 
         if (method === 'size' || method === 'length') {
           return obj ? (typeof obj.size === 'function' ? obj.size() : obj.length) : 0;
+        }
+        if (method === 'substr' && typeof obj === 'string') {
+          const pos = Number(this.evaluateExpression(mCall.args[0], scope));
+          const len = mCall.args.length > 1 ? Number(this.evaluateExpression(mCall.args[1], scope)) : undefined;
+          return len !== undefined ? obj.slice(pos, pos + len) : obj.slice(pos);
         }
         if (method === 'empty') {
           return obj ? (typeof obj.empty === 'function' ? obj.empty() : obj.length === 0) : true;

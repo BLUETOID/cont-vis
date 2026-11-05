@@ -14,6 +14,7 @@ export type ASTNodeType =
   | 'TieAssignmentStatement'
   | 'IfStatement'
   | 'WhileStatement'
+  | 'DoWhileStatement'
   | 'ForStatement'
   | 'RangeForStatement'
   | 'BreakStatement'
@@ -137,6 +138,12 @@ export interface WhileStatementNode extends BaseASTNode {
   type: 'WhileStatement';
   condition: BaseASTNode;
   body: BaseASTNode;
+}
+
+export interface DoWhileStatementNode extends BaseASTNode {
+  type: 'DoWhileStatement';
+  body: BaseASTNode;
+  condition: BaseASTNode;
 }
 
 export interface ForStatementNode extends BaseASTNode {

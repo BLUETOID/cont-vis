@@ -12,6 +12,7 @@ import type {
   VariableDeclarator,
   IfStatementNode,
   WhileStatementNode,
+  DoWhileStatementNode,
   ForStatementNode,
   RangeForStatementNode,
   ReturnStatementNode,
@@ -376,9 +377,11 @@ export class Parser {
       this.consume('PUNCTUATION', ')', "Expected ')' after constructor arguments");
     }
 
-    // Initializer e.g. = 0 or = {1, 2, 3}
+    // Initializer e.g. = 0 or = {1, 2, 3} or uniform initialization {1, 2, 3}
     let initializer: BaseASTNode | undefined;
     if (this.match('OPERATOR', '=')) {
+      initializer = this.parseExpression();
+    } else if (this.check('PUNCTUATION', '{')) {
       initializer = this.parseExpression();
     }
 
@@ -407,8 +410,20 @@ export class Parser {
         this.consume('PUNCTUATION', ']', "Expected ']'");
         if (sExpr) nextDimSizes.push(sExpr);
       }
+      let nextConstructorArgs: BaseASTNode[] | undefined;
+      if (this.match('PUNCTUATION', '(')) {
+        nextConstructorArgs = [];
+        if (!this.check('PUNCTUATION', ')')) {
+          do {
+            nextConstructorArgs.push(this.parseExpression());
+          } while (this.match('PUNCTUATION', ','));
+        }
+        this.consume('PUNCTUATION', ')', "Expected ')' after constructor arguments");
+      }
       let nextInit: BaseASTNode | undefined;
       if (this.match('OPERATOR', '=')) {
+        nextInit = this.parseExpression();
+      } else if (this.check('PUNCTUATION', '{')) {
         nextInit = this.parseExpression();
       }
       declarations.push({
@@ -417,6 +432,7 @@ export class Parser {
         arraySize: nextDimSizes[0],
         dimSizes: nextDimSizes.length > 0 ? nextDimSizes : undefined,
         initializer: nextInit,
+        constructorArgs: nextConstructorArgs,
       });
     }
 
@@ -474,6 +490,11 @@ export class Parser {
     // While
     if (this.match('KEYWORD', 'while')) {
       return this.parseWhileStatement(token.line);
+    }
+
+    // Do-While
+    if (this.match('KEYWORD', 'do')) {
+      return this.parseDoWhileStatement(token.line);
     }
 
     // For
@@ -565,6 +586,21 @@ export class Parser {
       type: 'WhileStatement',
       condition,
       body,
+      line,
+    };
+  }
+
+  private parseDoWhileStatement(line: number): DoWhileStatementNode {
+    const body = this.parseStatement();
+    this.consume('KEYWORD', 'while', "Expected 'while' after do body");
+    this.consume('PUNCTUATION', '(', "Expected '(' after 'while'");
+    const condition = this.parseExpression();
+    this.consume('PUNCTUATION', ')', "Expected ')' after condition");
+    this.consume('PUNCTUATION', ';', "Expected ';' after do-while condition");
+    return {
+      type: 'DoWhileStatement',
+      body,
+      condition,
       line,
     };
   }
@@ -662,109 +698,28 @@ export class Parser {
   }
 
   private parseExpressionOrAssignmentStatement(): BaseASTNode {
-    const expr = this.parseExpression();
-
-    // Check if this is an assignment: expr = right or expr += right
-    if (
-      this.match(
-        'OPERATOR',
-        '=',
-        '+=',
-        '-=',
-        '*=',
-        '/=',
-        '%=',
-        '&=',
-        '|=',
-        '^=',
-        '<<=',
-        '>>='
-      )
-    ) {
-      const op = this.previous().value;
-      const value = this.parseExpression();
-      this.consume('PUNCTUATION', ';', "Expected ';' after assignment");
-
-      if (expr.type === 'Identifier') {
-        if (op === '=') {
-          return {
-            type: 'AssignmentStatement',
-            target: (expr as IdentifierNode).name,
-            value,
-            line: expr.line,
-          } as AssignmentStatementNode;
-        } else {
-          return {
-            type: 'CompoundAssignmentStatement',
-            target: expr,
-            operator: op,
-            value,
-            line: expr.line,
-          } as CompoundAssignmentStatementNode;
-        }
-      }
-
-      if (
-        expr.type === 'CallExpression' &&
-        (expr as CallExpressionNode).callee === 'tie'
-      ) {
-        const vars = (expr as CallExpressionNode).args.map((a: any) =>
-          a.type === 'Identifier' ? (a as IdentifierNode).name : 'ignore'
-        );
-        return {
-          type: 'TieAssignmentStatement',
-          variables: vars,
-          value,
-          line: expr.line,
-        } as TieAssignmentStatementNode;
-      }
-
-      if (expr.type === 'MemberAccessExpression') {
-        if (op === '=') {
-          const mem = expr as MemberAccessExpressionNode;
-          return {
-            type: 'MemberAssignmentStatement',
-            object: mem.object,
-            property: mem.property,
-            value,
-            line: expr.line,
-          } as MemberAssignmentStatementNode;
-        } else {
-          return {
-            type: 'CompoundAssignmentStatement',
-            target: expr,
-            operator: op,
-            value,
-            line: expr.line,
-          } as CompoundAssignmentStatementNode;
-        }
-      }
-
-      if (expr.type === 'IndexAccessExpression') {
-        // Collect all chained indices: e.g. dp[i][j]
-        const indices: BaseASTNode[] = [];
-        let curr: BaseASTNode = expr;
-        while (curr.type === 'IndexAccessExpression') {
-          const idxAccess = curr as IndexAccessExpressionNode;
-          indices.unshift(idxAccess.index);
-          curr = idxAccess.array;
-        }
-        return {
-          type: 'IndexAssignmentStatement',
-          array: curr,
-          indices,
-          value,
-          operator: op,
-          line: expr.line,
-        } as IndexAssignmentStatementNode;
-      }
+    const first = this.parseAssignmentExpression();
+    if (this.match('PUNCTUATION', ',')) {
+      const exprs: BaseASTNode[] = [first];
+      do {
+        exprs.push(this.parseAssignmentExpression());
+      } while (this.match('PUNCTUATION', ','));
+      this.consume('PUNCTUATION', ';', "Expected ';' after expression");
+      return {
+        type: 'SequenceExpression',
+        expressions: exprs,
+        line: first.line,
+      } as SequenceExpressionNode;
     }
 
     this.consume('PUNCTUATION', ';', "Expected ';' after expression");
+    if (first.type.endsWith('Statement')) {
+      return first;
+    }
     return {
       type: 'ExpressionStatement',
-      expression: expr,
-      line: expr.line,
+      expression: first,
+      line: first.line,
     } as ExpressionStatementNode;
   }
 
@@ -816,6 +771,21 @@ export class Parser {
             line: expr.line,
           } as CompoundAssignmentStatementNode;
         }
+      }
+
+      if (
+        expr.type === 'CallExpression' &&
+        (expr as CallExpressionNode).callee === 'tie'
+      ) {
+        const vars = (expr as CallExpressionNode).args.map((a: any) =>
+          a.type === 'Identifier' ? (a as IdentifierNode).name : 'ignore'
+        );
+        return {
+          type: 'TieAssignmentStatement',
+          variables: vars,
+          value,
+          line: expr.line,
+        } as TieAssignmentStatementNode;
       }
 
       if (expr.type === 'MemberAccessExpression') {
