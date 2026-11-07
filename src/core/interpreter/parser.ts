@@ -1249,8 +1249,8 @@ export class Parser {
       } as CallExpressionNode;
     }
 
-    // Constructor / functional cast expressions: int(x), double(x), long(x), char(x), etc.
-    if (this.match('KEYWORD', 'int', 'long', 'double', 'float', 'char', 'bool', 'short', 'signed', 'unsigned')) {
+    // Constructor / functional cast expressions: void(x), int(x), double(x), long(x), char(x), etc.
+    if (this.match('KEYWORD', 'void', 'int', 'long', 'double', 'float', 'char', 'bool', 'short', 'signed', 'unsigned')) {
       const typeName = this.previous().value;
       if (this.match('PUNCTUATION', '(')) {
         const args: BaseASTNode[] = [];

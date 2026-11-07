@@ -727,5 +727,90 @@ describe('Comprehensive C++ Language & STL Features', () => {
       expect(res.error).toBeUndefined();
       expect(res.stdout).toContain('s=12345 sub=234 val=234');
     });
+
+    it('should support array element increments, return void(cout...), and while(t--) loops', () => {
+      const code = `
+        #include <bits/stdc++.h>
+        using namespace std;
+
+        using ll = long long;
+        using vi = vector<int>;
+        using vll = vector<ll>;
+        #define all(x) (x).begin(), (x).end()
+        #define sz(x) ((int)(x).size())
+
+        void solve() {
+            int n, k;
+            cin >> n >> k;
+            vector<int> a(n), cnt(n + 1), ct(n + 1);
+            for (int i = 0; i < n; i++) {
+                cin >> a[i];
+                cnt[a[i]]++;
+            }
+            for (int i = 0; i <= n; i++) {
+                if (cnt[i] % k) {
+                    return void (cout << 0 << endl);
+                } else {
+                    cnt[i] /= k;
+                }
+            }
+            int res = 0;
+            for (int l = 0, r = 0; r >= l && r < n; r++) {
+                ct[a[r]]++;
+                while (ct[a[r]] > cnt[a[r]]) {
+                    ct[a[l]]--;
+                    l++;
+                }
+                res += (r - l + 1);
+            }
+            cout << res << endl;
+        }
+
+        int main() {
+            int t = 1;
+            cin >> t;
+            while (t--) {
+                solve();
+            }
+            return 0;
+        }
+      `;
+      const res = runCppDPInterpreter(code, { stdin: '1\n4 2\n1 2 1 2' });
+      expect(res.error).toBeUndefined();
+      expect(res.stdout).toContain('7');
+    });
+
+    it('should support ++ and -- on 1D arrays, 2D arrays, members, and maps', () => {
+      const code = `
+        #include <iostream>
+        #include <vector>
+        #include <map>
+        using namespace std;
+        int main() {
+          vector<int> a = {10, 20};
+          a[0]++;
+          ++a[1];
+
+          vector<vector<int>> g = {{1, 2}, {3, 4}};
+          g[0][1]++;
+          --g[1][0];
+
+          pair<int, int> p = {5, 9};
+          p.first++;
+          p.second--;
+
+          map<int, int> mp;
+          mp[42]++;
+          mp[42]++;
+
+          cout << a[0] << " " << a[1] << " " << g[0][1] << " " << g[1][0];
+          cout << " " << p.first << " " << p.second << " " << mp[42] << endl;
+          return 0;
+        }
+      `;
+      const res = runCppDPInterpreter(code);
+      expect(res.error).toBeUndefined();
+      expect(res.stdout).toContain('11 21 3 2 6 8 2');
+    });
   });
 });

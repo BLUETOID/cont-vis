@@ -1284,6 +1284,9 @@ export class Evaluator {
         const cast = expr as any;
         const val = this.evaluateExpression(cast.argument, scope);
         const t = (cast.targetType || '').toLowerCase();
+        if (t === 'void') {
+          return undefined;
+        }
         if (t.includes('int') || t.includes('long') || t.includes('short') || t === 'll' || t === 'ull') {
           return Math.trunc(Number(val));
         }
@@ -1317,6 +1320,83 @@ export class Evaluator {
           scope.set(varName, newVal);
           return update.prefix ? newVal : oldVal;
         }
+
+        if (update.argument.type === 'IndexAccessExpression') {
+          const indices: BaseASTNode[] = [];
+          let curr: BaseASTNode = update.argument;
+          while (curr.type === 'IndexAccessExpression') {
+            const idxAccess = curr as IndexAccessExpressionNode;
+            indices.unshift(idxAccess.index);
+            curr = idxAccess.array;
+          }
+          const arrayTarget = this.evaluateExpression(curr, scope);
+          const arrayName = this.extractIdentifierName(curr) || 'arr';
+          const evaluatedIndices = indices.map((idxExpr) =>
+            this.evaluateExpression(idxExpr, scope)
+          );
+
+          if (arrayTarget instanceof CppMap) {
+            const key = evaluatedIndices[0];
+            const oldVal = Number(arrayTarget.get(key) ?? 0);
+            const newVal = update.operator === '++' ? oldVal + 1 : oldVal - 1;
+            arrayTarget.set(key, newVal);
+            this.recordStep(
+              update.line,
+              'compute',
+              `${arrayName}[${JSON.stringify(key)}]${update.operator} -> ${newVal}`
+            );
+            return update.prefix ? newVal : oldVal;
+          }
+
+          let container = arrayTarget;
+          for (let i = 0; i < evaluatedIndices.length - 1; i++) {
+            const idx = Number(evaluatedIndices[i]);
+            if (!container[idx]) container[idx] = [];
+            container = container[idx];
+          }
+
+          const lastIdx = Number(evaluatedIndices[evaluatedIndices.length - 1]);
+          const oldVal = Number(container[lastIdx] ?? 0);
+          const newVal = update.operator === '++' ? oldVal + 1 : oldVal - 1;
+          container[lastIdx] = newVal;
+
+          const idxStr = evaluatedIndices.map((i) => `[${i}]`).join('');
+          this.recordStep(
+            update.line,
+            'compute',
+            `${arrayName}${idxStr}${update.operator} -> ${newVal}`
+          );
+          return update.prefix ? newVal : oldVal;
+        }
+
+        if (update.argument.type === 'MemberAccessExpression') {
+          const mem = update.argument as MemberAccessExpressionNode;
+          const obj = this.evaluateExpression(mem.object, scope);
+          const objName = this.extractIdentifierName(mem.object) || 'obj';
+          if (Array.isArray(obj) && (mem.property === 'first' || mem.property === 'second')) {
+            const idx = mem.property === 'first' ? 0 : 1;
+            const oldVal = Number(obj[idx] ?? 0);
+            const newVal = update.operator === '++' ? oldVal + 1 : oldVal - 1;
+            obj[idx] = newVal;
+            this.recordStep(
+              update.line,
+              'compute',
+              `${objName}.${mem.property}${update.operator} -> ${newVal}`
+            );
+            return update.prefix ? newVal : oldVal;
+          } else if (obj && typeof obj === 'object') {
+            const oldVal = Number(obj[mem.property] ?? 0);
+            const newVal = update.operator === '++' ? oldVal + 1 : oldVal - 1;
+            obj[mem.property] = newVal;
+            this.recordStep(
+              update.line,
+              'compute',
+              `${objName}.${mem.property}${update.operator} -> ${newVal}`
+            );
+            return update.prefix ? newVal : oldVal;
+          }
+        }
+
         throw new Error('Update expression target must be a variable');
       }
 
@@ -1417,7 +1497,10 @@ export class Evaluator {
         const fnName = call.callee;
         const argValues = call.args.map((a) => this.evaluateExpression(a, scope));
 
-        // Functional type casts: int(x), double(x), ll(x)
+        // Functional type casts: void(x), int(x), double(x), ll(x)
+        if (fnName === 'void') {
+          return undefined;
+        }
         if (['int', 'long', 'll', 'short', 'signed', 'unsigned', 'int32_t', 'int64_t', 'uint32_t', 'uint64_t', 'size_t'].includes(fnName)) {
           return Math.trunc(Number(argValues[0] ?? 0));
         }
